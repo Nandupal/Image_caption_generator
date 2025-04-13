@@ -9,7 +9,7 @@ import pickle
 # Load pre-trained VGG16 model for feature extraction
 @st.cache_resource
 def load_feature_extractor():
-    base_model = VGG16()
+    base_model = VGG16(weights='imagenet')  # Specify weights explicitly
     model = Model(inputs=base_model.inputs, outputs=base_model.layers[-2].output)
     return model
 
@@ -22,14 +22,20 @@ def extract_features(image, model):
     feature = model.predict(image, verbose=0)
     return feature
 
-# Placeholder for your tokenizer and caption generation model
+# Load tokenizer with error handling
 def load_tokenizer():
-    with open("tokenizer.pkl", "rb") as f:
-        tokenizer = pickle.load(f)
-    return tokenizer
+    try:
+        with open("tokenizer.pkl", "rb") as f:
+            tokenizer = pickle.load(f)
+        return tokenizer
+    except FileNotFoundError:
+        st.error("Tokenizer file not found. Please ensure 'tokenizer.pkl' exists.")
+        return None
 
+# Dummy caption generation (to be replaced with your model's implementation)
 def generate_caption(feature, tokenizer):
-    # Placeholder dummy caption
+    if tokenizer is None:
+        return "Tokenizer not available."
     return "A caption generated for the uploaded image."
 
 # Streamlit App
@@ -45,7 +51,7 @@ if uploaded_file:
     features = extract_features(image, model)
 
     tokenizer = load_tokenizer()
-    caption = generate_caption(features, tokenizer)
-
-    st.markdown("### 📢 Generated Caption:")
-    st.success(caption)
+    if tokenizer:
+        caption = generate_caption(features, tokenizer)
+        st.markdown("### 📢 Generated Caption:")
+        st.success(caption)
