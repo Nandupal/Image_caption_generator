@@ -1,7 +1,9 @@
 streamlit
-tensorflow
+tensorflow>=2.8
 numpy
 Pillow
 matplotlib
 nltk
 tqdm
+h5py
+scikit-learn
